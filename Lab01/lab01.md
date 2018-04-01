@@ -6,7 +6,7 @@
 * busybox 1.28.1
 * qemu 2.15.0
 ### 环境搭建
-####内核编译
+#### 内核编译
 从 [kernel.org](https://www.kernel.org) 上下载 linux-4.15.15 内核源码，解压后，在本地进行编译。
 >编译过程中可能会出现错误，一般而言，根据提示安装相关的缺少的包即可解决
 ```
@@ -16,7 +16,7 @@ make oldconfig
 make x86_64_defconfig #防止交叉编译
 make
 ```
-####qemu编译
+#### qemu编译
 内核编译完成后，从 [qemu.org](https://www.qemu.org/) 获取 qemu 的最新版本，并编译安装。
 >也可以使用 ` sudo apt install qemu`直接安装
 ```
@@ -24,7 +24,7 @@ make clean
 make 
 make install
 ```
-####busybox安装并制作rootfs
+#### busybox安装并制作rootfs
 先安装busybox：
 ```
 wget http://busybox.net/downloads/busybox-1.28.1.tar.bz2
@@ -49,10 +49,10 @@ umount rootfs
 >此过程中出现权限不足的情况时，通过`sudo`临时提权即可
 
 最后将`rootfs.img`复制到 linux-4.15.15 文件夹下。
-###环境搭建相关问题
+### 环境搭建相关问题
 由于我的 Ubuntu 是新安装的系统，所以在搭建环境中常常出现各种包、库未安装的情况，这个时候只需要根据提示进行相应的安装即可。
-##二、使用 qemu+gdb 调试内核
-###启动 qemu
+## 二、使用 qemu+gdb 调试内核
+### 启动 qemu
 打开终端输入如下命令：
 ```
 cd linux-4.15.15
@@ -60,7 +60,7 @@ qemu-system-x86_64 -kernel arch/x86_64/boot/bzImage -initrd rootfs.img -append "
 ```
 这个时候打开了一个没有内容的 qemu 窗口，因为我们添加了`-S`参数，使得它在刚刚启动的时候就被我们冻结。
 ![qemu stop](resource/qemu1.png) 
-###启动 gdb 调试
+### 启动 gdb 调试
 然后另打开一个终端，进入`linux-4.15.15`，在此进行 gdb 调试：
 ```
 gdb -tui
@@ -70,11 +70,15 @@ gdb -tui
 (gdb) c #continue
 ```
 这个时候 qemu 窗口就会发生变化，停留在如下界面：
+
 ![qemu2](resource/QEMU2.png) 
+
 此时，gdb 调试的终端窗口如下：
+
 ![终端1](resource/终端1.png) 
+
 到这里，说明断点设置成功，我们已经可以通过断点来追踪 linux 启动过程了。
-##三、Linux 开机中的关键事件
+## 三、Linux 开机中的关键事件
 在完成内核初始化前的一些硬件相关准备工作后，`x86_64_start_reservation` 将调用`start_kernel()`，它是0号进程，所以我们先来看一下刚才找到的 start_kernel () 函数，做一下分析。
 ### start_kernel函数
 ```
