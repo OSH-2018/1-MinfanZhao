@@ -296,7 +296,9 @@ asmlinkage __visible void __init start_kernel(void)
 (gdb)c
 ```
 追踪到该函数：
+
 ![终端2](resource/终端2.png) 
+
 代码如下：
 ```
 set_task_stack_end_magic(struct task_struct *tsk)
@@ -309,16 +311,22 @@ set_task_stack_end_magic(struct task_struct *tsk)
 它设置了一个栈，并且设置了栈底来防止溢出。
 #### smp_setup_processor_id() 函数
 接下来使用同样的设置断点的方法，追踪到`smp_setup_processor_id()` 函数
+
 ![终端3](resource/终端3.png) 
+
 这个函数是用来设置 SMP 模型的 CPU 参数
 #### debug_objects_early_init() 函数
 在设置断点时发现找不到这个函数
 #### cgroup_init_early() 函数
+
 ![终端4](resource/终端4.png) 
+
 这里将初始化 control groups ，并且初始化任何需要 early init 的子系统
 #### boot_cpu_init() 函数
 在做完之前的初始化后，interrupts 依然不可用，这里将做一些必要的设置，使得interrupts 可用
+
 ![终端5](resource/终端5.png) 
+
 ```
 static void __init boot_cpu_init(void)
 {
@@ -335,15 +343,18 @@ static void __init boot_cpu_init(void)
 我设置断点时没有找到这个函数，但分析并查找资料后知道这里是打印版本信息在屏幕上。
 #### setup_arch(&command_line) 函数
 ![终端6](resource/终端6.png) 
+
 这个函数是进行体系结构的初始化，定义在`arch/x86/kernel/setup.c`中。
 `start_kernel`是一个通用的内核启动函数，但是在初始化过程中，有一些参数是依赖与硬件体系结构的，这些依赖于特定的硬件体系结构的设置就通过`setup_arch`来完成。
 #### trap_init() 函数
 ![终端7](resource/终端7.png) 
+
 `trap_init`是初始化硬件中断的函数，它被定义在`arch/x86/kernel/traps.c` 中，用于构建一些中断。
 #### mm_init() 函数
 `mm_init`被定义在`main.c`中，主要是用于内存的初始化
 #### sched_init() 函数
 ![终端8](resource/终端8.png) 
+
 `sched_init`是一个比较重要的函数，它主要用于对调度器进行初始化，主要工作为：
 
 + 对相关数据结构分配内存
@@ -353,9 +364,11 @@ static void __init boot_cpu_init(void)
 
 #### console_init() 函数
 ![终端9](resource/终端9.png) 
+
 用于初始化控制台
 #### rest_init() 函数
 ![终端10](resource/终端10.png) 
+
 这是`start_kernel`调用的最后一个函数，完成剩下的内核初始化。
 它会调用 `kernel_thread`创建1号进程`kernel_init`和2号进程`kthreadd`。
 ### 启动完成
